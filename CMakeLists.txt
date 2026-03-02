@@ -45,3 +45,15 @@ install(FILES
   "${CMAKE_CURRENT_BINARY_DIR}/axisConfigVersion.cmake"
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/axis
 )
+
+option(BUILD_TESTING "Build tests" ON)
+
+if(BUILD_TESTING)
+    enable_testing()
+
+    add_executable(axis_smoke src/main.cpp)
+    target_link_libraries(axis_smoke PRIVATE axis::axis)
+    add_test(NAME smoke COMMAND axis_smoke)
+
+    add_subdirectory(tests)
+endif()

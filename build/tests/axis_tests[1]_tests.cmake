@@ -1,0 +1,5 @@
+add_test([=[SPSCTest.InitiallyEmpty]=]  /Users/based/Documents/repos/axis/build/tests/axis_tests [==[--gtest_filter=SPSCTest.InitiallyEmpty]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[SPSCTest.InitiallyEmpty]=]  PROPERTIES DEF_SOURCE_LINE /Users/based/Documents/repos/axis/tests/spsc_test.cpp:12 WORKING_DIRECTORY /Users/based/Documents/repos/axis/build/tests SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test([=[SPSCTest.PushPopSingleElement]=]  /Users/based/Documents/repos/axis/build/tests/axis_tests [==[--gtest_filter=SPSCTest.PushPopSingleElement]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[SPSCTest.PushPopSingleElement]=]  PROPERTIES DEF_SOURCE_LINE /Users/based/Documents/repos/axis/tests/spsc_test.cpp:17 WORKING_DIRECTORY /Users/based/Documents/repos/axis/build/tests SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set(  axis_tests_TESTS SPSCTest.InitiallyEmpty SPSCTest.PushPopSingleElement)

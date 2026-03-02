@@ -1,0 +1,22 @@
+{
+  "tests": 2,
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "SPSCTest",
+      "tests": 2,
+      "testsuite": [
+        {
+          "name": "InitiallyEmpty",
+          "file": "\/Users\/based\/Documents\/repos\/axis\/tests\/spsc_test.cpp",
+          "line": 12
+        },
+        {
+          "name": "PushPopSingleElement",
+          "file": "\/Users\/based\/Documents\/repos\/axis\/tests\/spsc_test.cpp",
+          "line": 17
+        }
+      ]
+    }
+  ]
+}

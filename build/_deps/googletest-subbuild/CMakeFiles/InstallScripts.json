@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/based/Documents/repos/axis/build/_deps/googletest-subbuild/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
