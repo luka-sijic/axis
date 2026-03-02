@@ -1,5 +1,0 @@
-if(EXISTS "/Users/based/Documents/repos/axis/build/tests/axis_tests[1]_tests.cmake")
-  include("/Users/based/Documents/repos/axis/build/tests/axis_tests[1]_tests.cmake")
-else()
-  add_test(axis_tests_NOT_BUILT axis_tests_NOT_BUILT)
-endif()
