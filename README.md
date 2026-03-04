@@ -1,2 +1,2 @@
-# blib
-- My personal library of useful C++
+# axis
+- My personal library of useful C++ artifacts

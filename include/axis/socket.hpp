@@ -13,16 +13,23 @@ class tcp {
 public:
   struct Stream {
     int fd{-1};
+
     size_t send(std::span<const std::byte> bytes) {
-      return ::send(fd, bytes.data(), sizeof(bytes), 0);
+      return ::send(fd, bytes.data(), bytes.size_bytes(), 0);
     }
 
     size_t recv(std::span<std::byte> bytes) {
-      return ::recv(fd, bytes.data(), sizeof(bytes), 0);
+      return ::recv(fd, bytes.data(), bytes.size_bytes(), 0);
     }
+
     size_t send(std::string_view s) {
       auto bytes = std::as_bytes(std::span{s.data(), s.size()});
       return send(bytes);
+    }
+
+    void print(std::span<std::byte> bytes) {
+      std::cerr << std::string_view(
+          reinterpret_cast<const char *>(bytes.data()));
     }
   };
 
@@ -57,6 +64,5 @@ public:
 
 private:
   int fd_{};
-  int cfd_{};
 };
 }; // namespace axis

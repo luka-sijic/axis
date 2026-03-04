@@ -1,13 +1,25 @@
 #include <axis/sbbf.hpp>
 #include <axis/socket.hpp>
 #include <axis/spsc.hpp>
+#include <axis/vector.hpp>
+#include <chrono>
 #include <iostream>
+#include <thread>
 
 /*
 cmake -B build -DBUILD_TESTING=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build --target axis_test
 ./build/axis_test
 */
+
+void worker(axis::tcp::Stream s) {
+  std::array<std::byte, 4096> storage{};
+
+  while (true) {
+    s.recv(std::span<std::byte>(storage));
+    s.print(storage);
+  }
+}
 
 int main() {
   auto q = axis::spsc<uint32_t, 64>();
@@ -26,9 +38,24 @@ int main() {
   a.listener(8080);
   auto s = a.accept();
   std::array<std::byte, 4096> storage{};
-  s.recv(std::span<std::byte>(storage));
-  s.send("hi");
-  std::cout << std::string_view(reinterpret_cast<const char *>(storage.data()))
-            << std::endl;
+  std::thread wk(worker, std::move(s));
+  wk.join();
+
+  //  s.recv(std::span<std::byte>(storage));
+  for (int i = 0; i < 10; i++) {
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    s.send("hellO!");
+  }
+
+  // s.print(storage);
+
+  /*
+  auto v = axis::vector<int>(1024);
+  v[0] = 532;
+  v[2000] = 100;
+  std::cout << "Item located at: " << v[0] << std::endl;
+
+  std::cout << "Item located at: " << v[2000] << std::endl;
+  */
   return 0;
 }
