@@ -4,22 +4,70 @@
 #include <span>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <liburing.h>
 /*
 auto ln = axis::TCP::listener();
 */
 
 namespace axis {
+enum : std::uint64_t {
+  RECV_OP = 1,
+  SEND_OP = 2,
+};
+
 class tcp {
 public:
   struct Stream {
-    int fd{-1};
+    int fd_{-1};
+    io_uring ring_{};
 
-    size_t send(std::span<const std::byte> bytes) {
-      return ::send(fd, bytes.data(), bytes.size_bytes(), 0);
+    Stream(int fd) : fd_(fd) {
+      io_uring_queue_init(1024, &ring_, 0);
+      io_uring_submit(&ring_);
     }
 
-    size_t recv(std::span<std::byte> bytes) {
-      return ::recv(fd, bytes.data(), bytes.size_bytes(), 0);
+    void process() {
+      for (;;) {
+        io_uring_cqe *cqe{};
+        int rc = io_uring_wait_cqe(&ring_, &cqe);
+        switch (cqe->user_data) {
+          case RECV_OP:
+            std::cerr << "We recv\n";
+            break;
+          case SEND_OP:
+            std::cerr << "We send\n";
+            break;
+        }
+        io_uring_cqe_seen(&ring_, cqe);
+      }
+    }
+
+    size_t send(std::span<const std::byte> bytes) {
+      if (io_uring_sqe *sqe = io_uring_get_sqe(&ring_)) {
+        io_uring_prep_send(sqe, fd_, bytes.data(), bytes.size_bytes(), 0);
+        sqe->user_data = SEND_OP;
+        io_uring_submit(&ring_);
+      }
+      return -1;
+      //return ::send(fd_, bytes.data(), bytes.size_bytes(), 0);
+    }
+
+    ssize_t recv(std::span<std::byte> bytes) {
+      if (io_uring_sqe *sqe = io_uring_get_sqe(&ring_)) {
+        io_uring_prep_recv(sqe, fd_, bytes.data(), bytes.size_bytes(), 0);
+        sqe->user_data = RECV_OP;
+        
+        io_uring_submit(&ring_);
+
+        io_uring_cqe* cqe = nullptr;
+        io_uring_wait_cqe(&ring_, &cqe);
+
+        ssize_t res = cqe->res;
+
+        io_uring_cqe_seen(&ring_, cqe);
+        return res;
+      }
+      return -1;
     }
 
     size_t send(std::string_view s) {
@@ -46,7 +94,7 @@ public:
 
     if (::bind(fd_, reinterpret_cast<sockaddr *>(&server_addr),
                sizeof(server_addr)) < 0) {
-      std::cerr << "bind failed: " << std::strerror(errno) << std::endl;
+      //std::cerr << "bind failed: " << std::strerror(errno) << std::endl;
       ::close(fd_);
       return;
     }
@@ -58,7 +106,7 @@ public:
     for (;;) {
       int cfd = ::accept(fd_, nullptr, nullptr);
       if (cfd >= 0)
-        return Stream{.fd = cfd};
+        return Stream(cfd);
     }
   }
 

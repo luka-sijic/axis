@@ -12,15 +12,6 @@ cmake --build build --target axis_test
 ./build/axis_test
 */
 
-void worker(axis::tcp::Stream s) {
-  std::array<std::byte, 4096> storage{};
-
-  while (true) {
-    s.recv(std::span<std::byte>(storage));
-    s.print(storage);
-  }
-}
-
 int main() {
   auto q = axis::spsc<uint32_t, 64>();
   q.try_push(10);
@@ -38,14 +29,10 @@ int main() {
   a.listener(8080);
   auto s = a.accept();
   std::array<std::byte, 4096> storage{};
-  std::thread wk(worker, std::move(s));
-  wk.join();
 
-  //  s.recv(std::span<std::byte>(storage));
-  for (int i = 0; i < 10; i++) {
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    s.send("hellO!");
-  }
+  s.recv(std::span<std::byte>(storage));
+  s.print(storage);
+
 
   // s.print(storage);
 
