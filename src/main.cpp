@@ -1,6 +1,7 @@
 #include <axis/sbbf.hpp>
-#include <axis/socket.hpp>
+// #include <axis/socket.hpp>
 #include <axis/spsc.hpp>
+#include <axis/unique_ptr.hpp>
 #include <axis/vector.hpp>
 #include <chrono>
 #include <iostream>
@@ -25,24 +26,25 @@ int main() {
   std::cout << bf.possiblyContains("hi") << "\n";
   std::cout << bf.possiblyContains("wow") << "\n";
 
-  axis::tcp a;
-  a.listener(8080);
-  auto s = a.accept();
-  std::array<std::byte, 4096> storage{};
-
-  s.recv(std::span<std::byte>(storage));
-  s.print(storage);
-
-
-  // s.print(storage);
-
+  axis::unique_ptr<int> adz;
   /*
-  auto v = axis::vector<int>(1024);
-  v[0] = 532;
-  v[2000] = 100;
-  std::cout << "Item located at: " << v[0] << std::endl;
+    axis::tcp a;
+    a.listener(8080);
+    auto s = a.accept();
+    std::array<std::byte, 4096> storage{};
 
-  std::cout << "Item located at: " << v[2000] << std::endl;
-  */
+    s.recv(std::span<std::byte>(storage));
+    s.print(storage);
+
+
+    // s.print(storage);
+
+    auto v = axis::vector<int>(1024);
+    v[0] = 532;
+    v[2000] = 100;
+    std::cout << "Item located at: " << v[0] << std::endl;
+
+    std::cout << "Item located at: " << v[2000] << std::endl;
+    */
   return 0;
 }

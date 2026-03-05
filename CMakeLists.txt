@@ -53,7 +53,6 @@ if(BUILD_TESTING)
 
     add_executable(axis_smoke src/main.cpp)
     target_link_libraries(axis_smoke PRIVATE axis::axis)
-    target_link_libraries(axis_smoke PRIVATE uring)
     add_test(NAME smoke COMMAND axis_smoke)
 
     add_subdirectory(tests)
