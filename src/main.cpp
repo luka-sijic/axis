@@ -1,5 +1,5 @@
 #include <axis/sbbf.hpp>
-// #include <axis/socket.hpp>
+#include <axis/socket.hpp>
 #include <axis/spsc.hpp>
 #include <axis/unique_ptr.hpp>
 #include <axis/vector.hpp>
@@ -27,18 +27,17 @@ int main() {
   std::cout << bf.possiblyContains("wow") << "\n";
 
   axis::unique_ptr<int> adz;
+
+  axis::tcp a(8080);
+  auto s = a.accept();
+  s.process();
+  // std::array<std::byte, 4096> storage{};
+
+  // s.recv(std::span<std::byte>(storage));
+  // s.print(storage);
+
+  // s.print(storage);
   /*
-    axis::tcp a;
-    a.listener(8080);
-    auto s = a.accept();
-    std::array<std::byte, 4096> storage{};
-
-    s.recv(std::span<std::byte>(storage));
-    s.print(storage);
-
-
-    // s.print(storage);
-
     auto v = axis::vector<int>(1024);
     v[0] = 532;
     v[2000] = 100;
