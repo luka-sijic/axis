@@ -1,11 +1,16 @@
 #include <arpa/inet.h>
 #include <cerrno>
+#include <future>
+#include <thread>
+#include <chrono>
 #include <fcntl.h>
 #include <iostream>
 #include <liburing.h>
+#include <axis/parser.hpp>
 #include <span>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <axis/router.hpp>
 /*
 auto ln = axis::TCP::listener();
 */
@@ -24,6 +29,7 @@ class tcp {
 public:
   struct Stream {
     int fd_{-1};
+    Router router_{};
     io_uring ring_{};
 
     std::array<std::byte, 4096> rx_{};
@@ -48,11 +54,16 @@ public:
           std::string_view sv(reinterpret_cast<const char *>(rx_.data()),
                               static_cast<size_t>(res));
           std::cerr << sv << "\n";
-          send("HTTP/1.1 200 OK\r\n"
-               "Content-Length: 2\r\n"
-               "Connection: keep-alive\r\n"
-               "\r\n"
-               "OK");
+          auto fut = std::async(std::launch::async, [&] {
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+                std::cerr << "async work done";
+                                });
+          http_req req;
+          axis::parser::parse(sv, req);
+          auto fn = router_.get_handler(req.method, req.path);
+          auto str = fn();
+          std::cerr << str << "\n";
+          send(axis::parser::build_response(str));
           recv();
           break;
         }
