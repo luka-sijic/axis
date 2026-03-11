@@ -1,16 +1,17 @@
+#ifdef __linux__
 #include <arpa/inet.h>
+#include <axis/parser.hpp>
+#include <axis/router.hpp>
 #include <cerrno>
-#include <future>
-#include <thread>
 #include <chrono>
 #include <fcntl.h>
+#include <future>
 #include <iostream>
 #include <liburing.h>
-#include <axis/parser.hpp>
 #include <span>
 #include <sys/socket.h>
+#include <thread>
 #include <unistd.h>
-#include <axis/router.hpp>
 /*
 auto ln = axis::TCP::listener();
 */
@@ -55,9 +56,9 @@ public:
                               static_cast<size_t>(res));
           std::cerr << sv << "\n";
           auto fut = std::async(std::launch::async, [&] {
-                std::this_thread::sleep_for(std::chrono::seconds(5));
-                std::cerr << "async work done";
-                                });
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::cerr << "async work done";
+          });
           http_req req;
           axis::parser::parse(sv, req);
           auto fn = router_.get_handler(req.method, req.path);
@@ -143,3 +144,4 @@ private:
   int fd_{};
 };
 }; // namespace axis
+#endif
